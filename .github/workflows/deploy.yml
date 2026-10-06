@@ -1,0 +1,61 @@
+name: Deploy Go API
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version-file: go.mod
+
+      - name: Build for Linux
+        run: GOOS=linux GOARCH=amd64 go build -o recruiting-api
+
+      - name: Run tests
+        run: go test -v ./...
+
+      - name: Upload binary artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: recruiting-api-binary
+          path: recruiting-api
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Download binary
+        uses: actions/download-artifact@v4
+        with:
+          name: recruiting-api-binary
+
+      - name: Upload to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "recruiting-api"
+          target: "/tmp/"
+
+      - name: Restart service
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            sudo mv /tmp/recruiting-api /opt/recruiting-api/recruiting-api
+            sudo chmod +x /opt/recruiting-api/recruiting-api
+            sudo systemctl restart recruiting-api
+            sudo systemctl status recruiting-api --no-pager

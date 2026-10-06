@@ -13,6 +13,7 @@ import (
 )
 
 func main() {
+	//refire the deploy
 	cfg := config.Load()
 
 	publicDB := supabase.NewPublic(cfg.SupabaseURL, cfg.SupabaseAnonKey)

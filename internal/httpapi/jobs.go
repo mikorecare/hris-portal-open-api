@@ -33,7 +33,19 @@ type TeamMemberRow struct {
 
 // ---------- Handlers ----------
 
-// listJobs handles GET /jobs
+// listJobs lists published jobs with optional filters.
+// @Summary      List jobs
+// @Description  Returns published, active, non-private jobs.
+// @Tags         jobs
+// @Produce      json
+// @Param        employment_type  query  string  false  "Filter by employment type"
+// @Param        city             query  string  false  "Filter by city"
+// @Param        limit            query  int     false  "Max results (default 20, max 100)"
+// @Success      200  {object}  map[string]any
+// @Failure      401  {string}  string  "Missing or invalid API key"
+// @Failure      500  {string}  string  "Internal error"
+// @Security     ApiKeyAuth
+// @Router       /jobs [get]
 func (h *Handlers) listJobs(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
 

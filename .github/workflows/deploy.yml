@@ -15,6 +15,11 @@ jobs:
         with:
           go-version-file: go.mod
 
+      - name: Generate Swagger docs
+        run: |
+          go install github.com/swaggo/swag/cmd/swag@latest
+          swag init -g main.go --parseInternal -d ./,./internal/httpapi
+
       - name: Build for Linux
         run: GOOS=linux GOARCH=amd64 go build -o recruiting-api
 

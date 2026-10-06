@@ -9,6 +9,26 @@ import (
 	"time"
 )
 
+type ApplyRequest struct {
+	JobID     string         `json:"job_id"`
+	FirstName string         `json:"first_name"`
+	LastName  string         `json:"last_name"`
+	Email     string         `json:"email"`
+	Phone     string         `json:"phone"`
+	Answers   map[string]any `json:"answers"`
+}
+
+// apply proxies an application submission to the Next.js backend.
+// @Summary      Submit an application
+// @Tags         apply
+// @Accept       json
+// @Produce      json
+// @Param        application  body  ApplyRequest  true  "Application payload"
+// @Success      200  {object}  map[string]any
+// @Failure      400  {string}  string  "Missing required fields"
+// @Failure      502  {string}  string  "Upstream apply request failed"
+// @Security     ApiKeyAuth
+// @Router       /apply [post]
 func (h *Handlers) apply(w http.ResponseWriter, r *http.Request) {
 	const maxBodyBytes = 10 << 20 // 10 MB
 	body, err := io.ReadAll(io.LimitReader(r.Body, maxBodyBytes))

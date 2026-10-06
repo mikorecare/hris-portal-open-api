@@ -7,6 +7,13 @@ import (
 	"github.com/supabase-community/postgrest-go"
 )
 
+// adminListLocations lists active locations.
+// @Summary      List locations
+// @Tags         locations
+// @Produce      json
+// @Success      200  {object}  map[string]any
+// @Security     ApiKeyAuth
+// @Router       /locations [get]
 func (h *Handlers) adminListLocations(w http.ResponseWriter, r *http.Request) {
 	data, count, err := h.AdminDB.From("locations").
 		Select("*", "exact", false).

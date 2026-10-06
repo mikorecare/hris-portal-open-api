@@ -1,0 +1,115 @@
+basePath: /api/public
+definitions:
+  httpapi.ApplyRequest:
+    properties:
+      answers:
+        additionalProperties: {}
+        type: object
+      email:
+        type: string
+      first_name:
+        type: string
+      job_id:
+        type: string
+      last_name:
+        type: string
+      phone:
+        type: string
+    type: object
+host: careers.festivelightingpros.com
+info:
+  contact: {}
+  description: Public API for the FLP HRIS recruitment portal.
+  title: FLP HRIS Recruiting API
+  version: "1.0"
+paths:
+  /apply:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Application payload
+        in: body
+        name: application
+        required: true
+        schema:
+          $ref: '#/definitions/httpapi.ApplyRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Missing required fields
+          schema:
+            type: string
+        "502":
+          description: Upstream apply request failed
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Submit an application
+      tags:
+      - apply
+  /jobs:
+    get:
+      description: Returns published, active, non-private jobs.
+      parameters:
+      - description: Filter by employment type
+        in: query
+        name: employment_type
+        type: string
+      - description: Filter by city
+        in: query
+        name: city
+        type: string
+      - description: Max results (default 20, max 100)
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Missing or invalid API key
+          schema:
+            type: string
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: List jobs
+      tags:
+      - jobs
+  /locations:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: List locations
+      tags:
+      - locations
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: X-API-Key
+    type: apiKey
+swagger: "2.0"

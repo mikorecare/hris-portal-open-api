@@ -12,6 +12,14 @@ import (
 	"recruiting-api/internal/supabase"
 )
 
+// @title           FLP HRIS Recruiting API
+// @version         1.0
+// @description     Public API for the FLP HRIS recruitment portal.
+// @host            careers.festivelightingpros.com
+// @BasePath        /api/public
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name X-API-Key
 func main() {
 	//refire the deploy
 	cfg := config.Load()

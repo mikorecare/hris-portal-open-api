@@ -18,8 +18,6 @@ func NewRouter(db, adminDB *supabase.Client) (open, protected *http.ServeMux) {
 	open = http.NewServeMux()
 	open.HandleFunc("GET "+base, h.Root)
 	open.HandleFunc("GET "+base+"/health", h.Health)
-
-	// Swagger UI — no API key required, so reviewers can see the docs.
 	open.Handle("GET "+base+"/swagger/", httpSwagger.WrapHandler)
 
 	protected = http.NewServeMux()
@@ -27,6 +25,7 @@ func NewRouter(db, adminDB *supabase.Client) (open, protected *http.ServeMux) {
 	protected.HandleFunc("GET "+base+"/jobs/{id}", h.getJob)
 	protected.HandleFunc("POST "+base+"/apply", h.apply)
 	protected.HandleFunc("GET "+base+"/locations", h.adminListLocations)
+	protected.HandleFunc("GET "+base+"/job-titles", h.adminListJobTitles)
 
 	return open, protected
 }

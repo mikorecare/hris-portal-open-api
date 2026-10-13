@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -13,6 +14,7 @@ import (
 // ---------- Types ----------
 
 // TeamMember is the public shape emitted by the API.
+// NOTE: Role is populated from user_profiles.title, NOT the DB role column.
 type TeamMember struct {
 	DisplayName string  `json:"display_name"`
 	AvatarURL   *string `json:"avatar_url"`
@@ -27,7 +29,6 @@ type TeamMemberRow struct {
 	DisplayName string  `json:"display_name"`
 	AvatarURL   *string `json:"avatar_url"`
 	AboutMe     *string `json:"about_me"`
-	Role        *string `json:"role"`
 	Title       *string `json:"title"`
 }
 
@@ -228,7 +229,7 @@ func (h *Handlers) fetchTeamMembers(ids []string) ([]TeamMemberRow, error) {
 	inList := "(" + strings.Join(ids, ",") + ")"
 
 	data, _, err := h.AdminDB.From("user_profiles").
-		Select("id,display_name,avatar_url,about_me,role,title", "exact", false).
+		Select("id,display_name,avatar_url,about_me,title", "exact", false).
 		Filter("id", "in", inList).
 		Execute()
 	if err != nil {
@@ -246,15 +247,15 @@ func (h *Handlers) fetchTeamMembers(ids []string) ([]TeamMemberRow, error) {
 // toTeamMember converts a raw DB row into the public TeamMember shape.
 // Mirrors the Next.js mapping: `role` on the wire is filled from DB `title`.
 func toTeamMember(row TeamMemberRow) TeamMember {
-	role := ""
+	title := ""
 	if row.Title != nil {
-		role = *row.Title
+		title = *row.Title
 	}
 	return TeamMember{
 		DisplayName: row.DisplayName,
 		AvatarURL:   row.AvatarURL,
 		AboutMe:     row.AboutMe,
-		Role:        role,
+		Role:        title,
 	}
 }
 
@@ -273,11 +274,12 @@ func extractTeamIDs(raw any) []string {
 	return out
 }
 
-// keys returns the map keys as a slice.
+// keys returns the map keys as a sorted slice for deterministic URLs.
 func keys(m map[string]struct{}) []string {
 	out := make([]string, 0, len(m))
 	for k := range m {
 		out = append(out, k)
 	}
+	sort.Strings(out)
 	return out
 }

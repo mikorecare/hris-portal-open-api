@@ -21,8 +21,16 @@ func NewRouter(db, adminDB *supabase.Client) (open, protected *http.ServeMux) {
 	open.Handle("GET "+base+"/swagger/", httpSwagger.WrapHandler)
 
 	protected = http.NewServeMux()
+
+	// Jobs
 	protected.HandleFunc("GET "+base+"/jobs", h.listJobs)
 	protected.HandleFunc("GET "+base+"/jobs/{id}", h.getJob)
+
+	// People
+	protected.HandleFunc("GET "+base+"/people", h.listPeople)
+	protected.HandleFunc("GET "+base+"/people/{id}", h.getPerson)
+
+	// Other
 	protected.HandleFunc("POST "+base+"/apply", h.apply)
 	protected.HandleFunc("GET "+base+"/locations", h.adminListLocations)
 	protected.HandleFunc("GET "+base+"/job-titles", h.adminListJobTitles)

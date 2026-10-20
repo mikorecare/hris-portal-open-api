@@ -55,6 +55,21 @@ paths:
       summary: Submit an application
       tags:
       - apply
+  /job-titles:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: List job titles
+      tags:
+      - job-titles
   /jobs:
     get:
       description: Returns published, active, non-private jobs.
@@ -107,6 +122,52 @@ paths:
       summary: List locations
       tags:
       - locations
+  /people:
+    get:
+      description: Returns active people (is_displayed_on_web=true, is_approved=true)
+        with safe fields only.
+      parameters:
+      - description: Filter by department ID
+        in: query
+        name: department_id
+        type: string
+      - description: Filter by location type (onshore/offshore)
+        in: query
+        name: location_type
+        type: string
+      - description: Filter by country
+        in: query
+        name: country
+        type: string
+      - description: Search by name or job title
+        in: query
+        name: q
+        type: string
+      - description: Max results (default 20, max 100)
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Missing or invalid API key
+          schema:
+            type: string
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: List people
+      tags:
+      - people
 securityDefinitions:
   ApiKeyAuth:
     in: header
